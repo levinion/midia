@@ -1,7 +1,7 @@
 mod event;
 mod header;
-mod pitch;
-mod track;
+pub mod pitch;
+pub mod track;
 
 use std::{fmt::Display, fs::File, io::Write};
 
