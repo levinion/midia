@@ -22,7 +22,7 @@ impl MidiTrack {
             + 4
     }
 
-    pub fn note_on(mut self, delta_time: u8, pitch: Pitch, dynamics: u8) -> Self {
+    pub fn note_on(&mut self, delta_time: u8, pitch: Pitch, dynamics: u8) -> &mut Self {
         self.events.push(MidiEventDelta::new(
             delta_time,
             MidiEvent::NoteOn {
@@ -33,7 +33,7 @@ impl MidiTrack {
         self
     }
 
-    pub fn note_off(mut self, delta_time: u8, pitch: Pitch) -> Self {
+    pub fn note_off(&mut self, delta_time: u8, pitch: Pitch) -> &mut Self {
         self.events.push(MidiEventDelta::new(
             delta_time,
             MidiEvent::NoteOff {
@@ -44,7 +44,7 @@ impl MidiTrack {
         self
     }
 
-    pub fn note(self, delta_time: u8, pitch: Pitch, dynamics: u8) -> Self {
+    pub fn note(&mut self, delta_time: u8, pitch: Pitch, dynamics: u8) -> &mut Self {
         self.note_on(0, pitch, dynamics).note_off(delta_time, pitch)
     }
 
