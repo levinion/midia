@@ -3,12 +3,11 @@ mod header;
 pub mod pitch;
 pub mod track;
 
+pub use header::TrackType;
+
 use std::{fmt::Display, fs::File, io::Write};
 
-use crate::{
-    header::{MidiHeader, TrackType},
-    track::MidiTrack,
-};
+use crate::{header::MidiHeader, track::MidiTrack};
 
 pub struct MidiWriter {
     data: MidiData,
