@@ -1,10 +1,4 @@
-use crate::{IntoMidiData, MidiData};
-
-pub enum TrackType {
-    Single = 0,
-    MultiSync = 1,
-    MultiAsync = 2,
-}
+use crate::{typ::TrackType, IntoMidiData, MidiData};
 
 pub struct MidiHeader {
     typ: TrackType,

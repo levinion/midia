@@ -2,10 +2,12 @@ mod event;
 mod header;
 pub mod pitch;
 pub mod track;
-
-pub use header::TrackType;
+pub mod typ;
+mod util;
 
 use std::{fmt::Display, fs::File, io::Write};
+
+use typ::TrackType;
 
 use crate::{header::MidiHeader, track::MidiTrack};
 
@@ -14,9 +16,9 @@ pub struct MidiWriter {
 }
 
 impl MidiWriter {
-    pub fn new(typ: TrackType, track_number: u16, basic_time: u16) -> Self {
+    pub fn new(typ: TrackType, track_number: u16, bpm: u16) -> Self {
         let mut data = MidiData::new();
-        let header = MidiHeader::new(typ, track_number, basic_time);
+        let header = MidiHeader::new(typ, track_number, bpm);
         data.push_data(header);
         Self { data }
     }

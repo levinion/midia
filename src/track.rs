@@ -1,17 +1,34 @@
 use crate::{
     event::{MidiEvent, MidiEventDelta},
     pitch::Pitch,
+    typ::{InstrumentType, Tonality},
     IntoMidiData, MidiData,
 };
 
 pub struct MidiTrack {
     events: Vec<MidiEventDelta>,
+    tonality: Tonality,
+    bpm: u16,
 }
 
 #[allow(clippy::new_without_default)]
 impl MidiTrack {
     pub fn new() -> Self {
-        Self { events: vec![] }
+        Self {
+            events: vec![],
+            tonality: Tonality::C,
+            bpm: 120,
+        }
+    }
+
+    pub fn set_tonality(mut self, tonality: Tonality) -> Self {
+        self.tonality = tonality;
+        self
+    }
+
+    pub fn set_bpm(mut self, bpm: u16) -> Self {
+        self.bpm = bpm;
+        self
     }
 
     fn data_size(&self) -> u32 {
@@ -19,40 +36,58 @@ impl MidiTrack {
             .iter()
             .map(|event| event.size() as u32)
             .sum::<u32>()
-            + 4
+            + 4 // end flag size
     }
 
-    pub fn note_on(&mut self, delta_time: u8, pitch: Pitch, dynamics: u8) -> &mut Self {
+    pub fn note_on(mut self, beats: f32, pitch: Pitch, velocity: u8) -> Self {
         self.events.push(MidiEventDelta::new(
-            delta_time,
+            (beats * self.bpm as f32) as u16,
             MidiEvent::NoteOn {
-                note: pitch as u8,
-                dynamics,
+                note: (pitch as u8 + self.tonality as u8),
+                velocity,
             },
         ));
         self
     }
 
-    pub fn note_off(&mut self, delta_time: u8, pitch: Pitch) -> &mut Self {
+    pub fn note_off(mut self, beats: f32, pitch: Pitch) -> Self {
         self.events.push(MidiEventDelta::new(
-            delta_time,
+            (beats * self.bpm as f32) as u16,
             MidiEvent::NoteOff {
                 note: pitch as u8,
-                dynamics: 0,
+                velocity: 0,
             },
         ));
         self
     }
 
-    pub fn note(&mut self, delta_time: u8, pitch: Pitch, dynamics: u8) -> &mut Self {
-        self.note_on(0, pitch, dynamics).note_off(delta_time, pitch)
+    pub fn note(self, beats: f32, pitch: Pitch, velocity: u8) -> Self {
+        self.note_on(0., pitch, velocity).note_off(beats, pitch)
     }
 
-    pub fn change_instrument(mut self, delta_time: u8, code: u8) -> Self {
+    pub fn change_instrument(mut self, instrument: InstrumentType) -> Self {
+        self.events.push(MidiEventDelta::new(
+            0,
+            MidiEvent::ProgramChange {
+                code: instrument as u8,
+            },
+        ));
+        self
+    }
+
+    pub fn note_after_push(mut self, delta_time: u16, pitch: Pitch, amount: u8) -> Self {
         self.events.push(MidiEventDelta::new(
             delta_time,
-            MidiEvent::ChangeInstrument { code },
+            MidiEvent::NoteAfterTouch {
+                note: pitch as u8,
+                amount,
+            },
         ));
+        self
+    }
+
+    pub fn repeat(mut self, n: usize) -> Self {
+        self.events = self.events.repeat(n);
         self
     }
 }
