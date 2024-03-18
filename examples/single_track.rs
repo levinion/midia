@@ -7,7 +7,8 @@ use midia::{
 
 fn main() {
     let mut writer = MidiWriter::new(TrackType::Single, 1, 120);
-    let track = MidiTrack::new()
+    let mut track = MidiTrack::new();
+    track
         .set_bpm(120)
         .set_tonality(Tonality::G)
         .change_instrument(InstrumentType::AcousticGrandPiano)

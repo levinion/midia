@@ -21,12 +21,12 @@ impl MidiTrack {
         }
     }
 
-    pub fn set_tonality(mut self, tonality: Tonality) -> Self {
+    pub fn set_tonality(&mut self, tonality: Tonality) -> &mut Self {
         self.tonality = tonality;
         self
     }
 
-    pub fn set_bpm(mut self, bpm: u16) -> Self {
+    pub fn set_bpm(&mut self, bpm: u16) -> &mut Self {
         self.bpm = bpm;
         self
     }
@@ -39,7 +39,7 @@ impl MidiTrack {
             + 4 // end flag size
     }
 
-    pub fn note_on(mut self, beats: f32, pitch: Pitch, velocity: u8) -> Self {
+    pub fn note_on(&mut self, beats: f32, pitch: Pitch, velocity: u8) -> &mut Self {
         self.events.push(MidiEventDelta::new(
             (beats * self.bpm as f32) as u16,
             MidiEvent::NoteOn {
@@ -50,7 +50,7 @@ impl MidiTrack {
         self
     }
 
-    pub fn note_off(mut self, beats: f32, pitch: Pitch) -> Self {
+    pub fn note_off(&mut self, beats: f32, pitch: Pitch) -> &mut Self {
         self.events.push(MidiEventDelta::new(
             (beats * self.bpm as f32) as u16,
             MidiEvent::NoteOff {
@@ -61,11 +61,11 @@ impl MidiTrack {
         self
     }
 
-    pub fn note(self, beats: f32, pitch: Pitch, velocity: u8) -> Self {
+    pub fn note(&mut self, beats: f32, pitch: Pitch, velocity: u8) -> &mut Self {
         self.note_on(0., pitch, velocity).note_off(beats, pitch)
     }
 
-    pub fn change_instrument(mut self, instrument: InstrumentType) -> Self {
+    pub fn change_instrument(&mut self, instrument: InstrumentType) -> &mut Self {
         self.events.push(MidiEventDelta::new(
             0,
             MidiEvent::ProgramChange {
@@ -75,7 +75,7 @@ impl MidiTrack {
         self
     }
 
-    pub fn note_after_push(mut self, delta_time: u16, pitch: Pitch, amount: u8) -> Self {
+    pub fn note_after_push(&mut self, delta_time: u16, pitch: Pitch, amount: u8) -> &mut Self {
         self.events.push(MidiEventDelta::new(
             delta_time,
             MidiEvent::NoteAfterTouch {
@@ -86,7 +86,7 @@ impl MidiTrack {
         self
     }
 
-    pub fn repeat(mut self, n: usize) -> Self {
+    pub fn repeat(&mut self, n: usize) -> &mut Self {
         self.events = self.events.repeat(n);
         self
     }
